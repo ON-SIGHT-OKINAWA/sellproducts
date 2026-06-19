@@ -3,219 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>沖縄特産品 卸売オンラインストア</title>
+    <title>沖縄特産品 BtoB卸売ポータル【社内用】</title>
     <style>
-        :root {
-            --primary-color: #007a87; /* 沖縄の海をイメージしたターコイズ */
-            --accent-color: #e60012;  /* ハイビスカスレッド */
-            --bg-color: #f4f7f6;
-        }
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
             color: #333;
         }
         header {
-            background-color: var(--primary-color);
+            background-color: #008080;
             color: white;
-            padding: 1rem 2rem;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        header h1 { margin: 0; font-size: 24px; }
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-        .card {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
             background: white;
+            border: 2px dashed #008080;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
-        .card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background-color: #eee;
-        }
-        .card-content {
-            padding: 1.5rem;
-            flex-grow: 1;
-        }
-        .badge {
-            background: var(--accent-color);
-            color: white;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.8rem;
-            border-radius: 4px;
-        }
-        .price {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            font-weight: bold;
-            margin: 0.5rem 0;
-        }
-        .moq {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        /* 管理画面風フォーム */
-        .admin-section {
-            background: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 3rem;
-            border: 2px dashed var(--primary-color);
-        }
+        h2 { color: #333; margin-top: 0; }
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 20px;
         }
-        .form-group label {
+        label {
             display: block;
-            margin-bottom: 0.5rem;
             font-weight: bold;
+            margin-bottom: 8px;
         }
-        .form-group input, .form-group text-area {
+        input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 0.5rem;
+            padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
         }
-        button {
-            background: var(--primary-color);
+        input[type="file"] {
+            display: block;
+            margin-top: 5px;
+        }
+        .btn-submit {
+            background-color: #008080;
             color: white;
             border: none;
-            padding: 0.7rem 1.5rem;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 1rem;
+            width: 200px;
         }
-        button:hover {
-            opacity: 0.9;
+        .btn-submit:hover { background-color: #005a5a; }
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
         }
+        .success { background-color: #d4edda; color: #155724; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>🌺 沖縄特産品 BtoB卸売ポータル</h1>
-    <div>【バイヤー専用ページ】</div>
-</header>
+    <header>
+        <h1>🌺 沖縄特産品 BtoB卸売ポータル</h1>
+        <div>【バイヤー専用ページ】</div>
+    </header>
 
-<div class="container">
-
-    <section class="admin-section">
+    <div class="container">
         <h2>【社内用】新商品・写真の追加フォーム</h2>
+        
         <form id="productForm">
             <div class="form-group">
                 <label for="pName">商品名</label>
                 <input type="text" id="pName" placeholder="例：沖縄県産完熟マンゴー 4kg" required>
             </div>
+            
             <div class="form-group">
                 <label for="pPrice">卸価格 (税別)</label>
-                <input type="number" id="pPrice" placeholder="例：8000" required>
+                <input type="text" id="pPrice" placeholder="例：8000" required>
             </div>
+            
             <div class="form-group">
-                <label for="pMoq">最低ロット (MOQ)</label>
-                <input type="text" id="pMoq" placeholder="例：5ケースから" required>
+                <label for="pLot">最低ロット (MOQ)</label>
+                <input type="text" id="pLot" placeholder="例：5ケースから" required>
             </div>
+            
             <div class="form-group">
                 <label for="pImage">商品写真</label>
                 <input type="file" id="pImage" accept="image/*" required>
             </div>
-            <button type="submit">サイトに商品を登録する</button>
+            
+            <button type="submit" class="btn-submit">サイトに商品を登録する</button>
         </form>
-    </section>
 
-    <h2>取扱商品一覧</h2>
-    <div class="grid" id="productGrid">
-        </div>
+        <div id="msg" class="message success">商品を登録しました！お客さんページに反映されます。</div>
+    </div>
 
-</div>
-
-<script>
-    // 初期サンプルデータ
-    const defaultProducts = [
-        {
-            name: "大容量パック 生海ぶどう (タレ付き)",
-            price: 4500,
-            moq: "10パックから",
-            image: "https://images.unsplash.com/photo-1534482421-64566f976cfa?auto=format&fit=crop&w=400&q=80" // サンプル用のダミー画像
-        }
-    ];
-
-    // ローカルストレージから商品を取得、なければ初期データをセット
-    let products = JSON.parse(localStorage.getItem('okinawa_products')) || defaultProducts;
-
-    const productGrid = document.getElementById('productGrid');
-    const productForm = document.getElementById('productForm');
-
-    // 商品一覧を画面に描画する関数
-    function displayProducts() {
-        productGrid.innerHTML = '';
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <img src="${product.image}" alt="${product.name}">
-                <div class="card-content">
-                    <span class="badge">卸売専用</span>
-                    <h3>${product.name}</h3>
-                    <div class="price">¥${Number(product.price).toLocaleString()} <span style="font-size:0.8rem; color:#666;">(税別)</span></div>
-                    <div class="moq">📦 最低注文数: ${product.moq}</div>
-                    <button style="margin-top:1rem; width:100%; background-color:#e60012;">注文カートへ進む(準備中)</button>
-                </div>
-            `;
-            productGrid.appendChild(card);
+    <script>
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const lot = document.getElementById('pLot').value;
+            const fileInput = document.getElementById('pImage');
+            const file = fileInput.files[0];
+            
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const base64Image = reader.result; // 画像をデータ化
+                
+                // 既存のデータを取得、なければ空の配列
+                let products = JSON.parse(localStorage.getItem('okinawa_products')) || [];
+                
+                // 新しい商品を追加
+                products.push({
+                    name: name,
+                    price: price,
+                    lot: lot,
+                    image: base64Image
+                });
+                
+                // 保存
+                localStorage.setItem('okinawa_products', JSON.stringify(products));
+                
+                // フォームをリセットしてメッセージ表示
+                document.getElementById('productForm').reset();
+                const msg = document.getElementById('msg');
+                msg.style.display = 'block';
+                setTimeout(() => { msg.style.display = 'none'; }, 4000);
+            }
+            
+            if (file) {
+                reader.readAsDataURL(file);
+            }
         });
-    }
-
-    // フォーム送信時の処理（商品・写真の追加）
-    productForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const name = document.getElementById('pName').value;
-        const price = document.getElementById('pPrice').value;
-        const moq = document.getElementById('pMoq').value;
-        const imageFile = document.getElementById('pImage').files[0];
-
-        const reader = new FileReader();
-        
-        // 画像をブラウザに保存できるデータ形式(Base64)に変換
-        reader.onloadend = function() {
-            const newProduct = {
-                name: name,
-                price: price,
-                moq: moq,
-                image: reader.result // 変換された画像データ
-            };
-
-            products.push(newProduct);
-            localStorage.setItem('okinawa_products', JSON.stringify(products)); // 保存
-            displayProducts(); // 再描画
-            productForm.reset(); // フォームをきれいにする
-            alert('商品を登録しました！ページを更新しても残ります。');
-        }
-
-        if (imageFile) {
-            reader.readAsDataURL(imageFile);
-        }
-    });
-
-    // 最初に商品を表示
-    displayProducts();
-</script>
+    </script>
 </body>
 </html>
