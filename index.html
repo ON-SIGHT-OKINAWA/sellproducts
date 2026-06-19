@@ -58,7 +58,7 @@
             </div>
             
             <div class="form-group">
-                <label for="pImage">商品写真</label>
+                <label for="pImage">商品写真（スマホ撮影の写真もそのまま選んでOK）</label>
                 <input type="file" id="pImage" accept="image/*" required>
             </div>
             
@@ -85,10 +85,8 @@
     </div>
 
     <script>
-        // ⚠️ 正しい大文字（W）に修正したURLをセットしました
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzrtwtAcghMzUbulNWcBfe7wq2qMN6kgLOnhqUKI9aCdS0y/exec";
         
-        // スプレッドシートからデータを取得して表示する関数
         function fetchProducts() {
             document.getElementById('loadingStatus').style.display = 'block';
             fetch(GAS_URL, { cache: "no-store" })
@@ -125,7 +123,7 @@
                 });
         }
 
-        // 商品を登録する処理
+        // フォーム送信時の処理
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -140,20 +138,22 @@
             
             const reader = new FileReader();
             reader.onloadend = function() {
-                const base64Image = reader.result;
-                
                 const img = new Image();
-                img.src = base64Image;
+                img.src = reader.result;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    const maxW = 500;
+                    
+                    // カタログ用なので、横幅を最大400pxに制限（これで劇的に軽くなります）
+                    const maxW = 400; 
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
+                    
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6);
+                    // 画質を少し落として（0.5）、Googleの制限に絶対引っかからないサイズに強制変換
+                    const compressedImage = canvas.toDataURL('image/jpeg', 0.5);
 
                     fetch(GAS_URL, {
                         method: 'POST',
@@ -176,14 +176,13 @@
                     .catch(err => {
                         submitBtn.disabled = false;
                         submitBtn.innerText = 'サイトに商品を登録する';
-                        alert('登録に失敗しました。Google側の認証（Continue）が完了しているか確認してください。');
+                        alert('登録に失敗しました。画像のサイズが大きすぎるか、通信環境が良い場所でもう一度お試しください。');
                     });
                 };
             };
             if (file) reader.readAsDataURL(file);
         });
 
-        // 金額を修正する処理
         function editPrice(index, currentName, currentPrice) {
             const newPrice = prompt(`「${currentName}」の新しい卸価格を入力してください（半角数字のみ）`, currentPrice);
             if (newPrice === null || newPrice.trim() === "" || isNaN(newPrice)) return;
@@ -202,9 +201,8 @@
             });
         }
 
-        // 商品を削除する処理
         function deleteProduct(index) {
-            if (!confirm('この商品を削除してもよろしいですか？（スプレッドシートおよびお客様ページからも消えます）')) return;
+            if (!confirm('この商品を削除してもよろしいですか？')) return;
             
             fetch(GAS_URL, {
                 method: 'POST',
