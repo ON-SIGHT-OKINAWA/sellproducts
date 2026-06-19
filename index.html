@@ -5,77 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>沖縄特産品 BtoB卸売ポータル【社内用】</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-        header {
-            background-color: #008080;
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
+        header { background-color: #008080; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
         header h1 { margin: 0; font-size: 24px; }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background: white;
-            border: 2px dashed #008080;
-            border-radius: 8px;
-        }
-        h2 { color: #333; margin-top: 0; }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        input[type="file"] {
-            display: block;
-            margin-top: 5px;
-        }
-        .btn-submit {
-            background-color: #008080;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 200px;
-        }
+        .container { max-width: 950px; margin: 40px auto; padding: 30px; background: white; border: 2px dashed #008080; border-radius: 8px; }
+        h2 { color: #333; margin-top: 0; border-bottom: 2px solid #008080; padding-bottom: 8px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { background-color: #008080; color: white; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 220px; }
         .btn-submit:hover { background-color: #005a5a; }
-        .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-            font-weight: bold;
-        }
-        .success { background-color: #d4edda; color: #155724; }
+        .btn-submit:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .manager-section { margin-top: 50px; }
+        .product-list-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
+        .product-list-table th, .product-list-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .product-list-table th { background-color: #f2f2f2; font-weight: bold; }
+        .thumb-img { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        .action-btns { display: flex; gap: 8px; }
+        .btn-edit { background-color: #ffc107; color: #212529; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-edit:hover { background-color: #e0a800; }
+        .btn-delete { background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-delete:hover { background-color: #bd2130; }
+        .no-data { text-align: center; color: #888; padding: 20px; }
+        .loading-text { color: #008080; font-weight: bold; text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🌺 沖縄特産品 BtoB卸売ポータル</h1>
-        <div>【バイヤー専用ページ】</div>
+        <div>【社内管理用画面】</div>
     </header>
 
     <div class="container">
@@ -88,8 +48,8 @@
             </div>
             
             <div class="form-group">
-                <label for="pPrice">卸価格 (税別)</label>
-                <input type="text" id="pPrice" placeholder="例：8000" required>
+                <label for="pPrice">卸価格 (税別) ※数字のみ</label>
+                <input type="number" id="pPrice" placeholder="例：8000" required>
             </div>
             
             <div class="form-group">
@@ -102,15 +62,75 @@
                 <input type="file" id="pImage" accept="image/*" required>
             </div>
             
-            <button type="submit" class="btn-submit">サイトに商品を登録する</button>
+            <button type="submit" id="submitBtn" class="btn-submit">サイトに商品を登録する</button>
         </form>
 
-        <div id="msg" class="message success">商品を登録しました！お客さんページに反映されます。</div>
+        <div class="manager-section">
+            <h2>現在登録済みの商品一覧（スプレッドシート同期中）</h2>
+            <div id="loadingStatus" class="loading-text">データを読み込み中...</div>
+            <table class="product-list-table">
+                <thead>
+                    <tr>
+                        <th>写真</th>
+                        <th>商品名</th>
+                        <th>卸価格</th>
+                        <th>最低ロット</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="managerTableBody">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
+        // ⚠️【ここにGoogleで発行されたウェブアプリのURLを貼り付けてください】
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzrtwtAcghMzUbulNWCbFe7wq2qMN6kgLOnhqUKI9aCdS0y/exec";
+
+        // スプレッドシートからデータを取得して表示する関数
+        function fetchProducts() {
+            document.getElementById('loadingStatus').style.display = 'block';
+            fetch(GAS_URL)
+                .then(response => response.json())
+                .then(products => {
+                    document.getElementById('loadingStatus').style.display = 'none';
+                    const tbody = document.getElementById('managerTableBody');
+                    
+                    if (products.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="no-data">現在、登録されている商品はありません。</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = '';
+                    products.forEach((product, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><img src="${product.image}" class="thumb-img"></td>
+                            <td><strong>${product.name}</strong></td>
+                            <td>￥${Number(product.price).toLocaleString()}</td>
+                            <td>${product.lot}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-edit" onclick="editPrice(${index}, '${product.name}', ${product.price})">金額を修正</button>
+                                    <button class="btn-delete" onclick="deleteProduct(${index})">削除</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(err => {
+                    document.getElementById('loadingStatus').innerText = 'データの読み込みに失敗しました。URLを確認してください。';
+                });
+        }
+
+        // 商品を登録する処理
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerText = '登録処理中...';
             
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
@@ -120,33 +140,84 @@
             
             const reader = new FileReader();
             reader.onloadend = function() {
-                const base64Image = reader.result; // 画像をデータ化
+                const base64Image = reader.result;
                 
-                // 既存のデータを取得、なければ空の配列
-                let products = JSON.parse(localStorage.getItem('okinawa_products')) || [];
-                
-                // 新しい商品を追加
-                products.push({
-                    name: name,
-                    price: price,
-                    lot: lot,
-                    image: base64Image
-                });
-                
-                // 保存
-                localStorage.setItem('okinawa_products', JSON.stringify(products));
-                
-                // フォームをリセットしてメッセージ表示
-                document.getElementById('productForm').reset();
-                const msg = document.getElementById('msg');
-                msg.style.display = 'block';
-                setTimeout(() => { msg.style.display = 'none'; }, 4000);
-            }
-            
-            if (file) {
-                reader.readAsDataURL(file);
-            }
+                // 重くならないための画像軽量化処理（画質を少し落として文字数を減らす）
+                const img = new Image();
+                img.src = base64Image;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    // 最大幅を500pxに縮小
+                    const maxW = 500;
+                    const scale = maxW / img.width;
+                    canvas.width = maxW;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6); // 容量を約70%カット
+
+                    // GAS（Google）へデータを送信
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'add',
+                            name: name,
+                            price: price,
+                            lot: lot,
+                            image: compressedImage
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'サイトに商品を登録する';
+                        document.getElementById('productForm').reset();
+                        fetchProducts();
+                        alert('スプレッドシートに正常に登録されました！');
+                    });
+                };
+            };
+            if (file) reader.readAsDataURL(file);
         });
+
+        // 金額を修正する処理
+        function editPrice(index, currentName, currentPrice) {
+            const newPrice = prompt(`「${currentName}」の新しい卸価格を入力してください（半角数字のみ）`, currentPrice);
+            if (newPrice === null || newPrice.trim() === "" || isNaN(newPrice)) return;
+            
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'editPrice',
+                    index: index,
+                    price: newPrice.trim()
+                })
+            })
+            .then(() => {
+                fetchProducts();
+                alert('金額を修正しました。');
+            });
+        }
+
+        // 商品を削除する処理
+        function deleteProduct(index) {
+            if (!confirm('この商品を削除してもよろしいですか？（スプレッドシートおよびお客様ページからも消えます）')) return;
+            
+            fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'delete',
+                    index: index
+                })
+            })
+            .then(() => {
+                fetchProducts();
+                alert('商品を削除しました。');
+            });
+        }
+
+        window.onload = fetchProducts;
     </script>
 </body>
 </html>
