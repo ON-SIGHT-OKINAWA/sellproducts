@@ -79,19 +79,19 @@
                     </tr>
                 </thead>
                 <tbody id="managerTableBody">
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // ⚠️【ここにGoogleで発行されたウェブアプリのURLを貼り付けてください】
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzrtwtAcghMzUbulNWCbFe7wq2qMN6kgLOnhqUKI9aCdS0y/exec";
+        // ⚠️ 正しい大文字（W）に修正したURLをセットしました
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzrtwtAcghMzUbulNWcBfe7wq2qMN6kgLOnhqUKI9aCdS0y/exec";
         
         // スプレッドシートからデータを取得して表示する関数
         function fetchProducts() {
             document.getElementById('loadingStatus').style.display = 'block';
-            fetch(GAS_URL)
+            fetch(GAS_URL, { cache: "no-store" })
                 .then(response => response.json())
                 .then(products => {
                     document.getElementById('loadingStatus').style.display = 'none';
@@ -121,7 +121,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzr
                     });
                 })
                 .catch(err => {
-                    document.getElementById('loadingStatus').innerText = 'データの読み込みに失敗しました。URLを確認してください。';
+                    document.getElementById('loadingStatus').innerText = 'データの読み込みに失敗しました。時間をおいて再読み込みしてください。';
                 });
         }
 
@@ -142,22 +142,19 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzr
             reader.onloadend = function() {
                 const base64Image = reader.result;
                 
-                // 重くならないための画像軽量化処理（画質を少し落として文字数を減らす）
                 const img = new Image();
                 img.src = base64Image;
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    // 最大幅を500pxに縮小
                     const maxW = 500;
                     const scale = maxW / img.width;
                     canvas.width = maxW;
                     canvas.height = img.height * scale;
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
-                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6); // 容量を約70%カット
+                    const compressedImage = canvas.toDataURL('image/jpeg', 0.6);
 
-                    // GAS（Google）へデータを送信
                     fetch(GAS_URL, {
                         method: 'POST',
                         body: JSON.stringify({
@@ -175,6 +172,11 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbzHc_cxANoYwx1rfN7oigzr
                         document.getElementById('productForm').reset();
                         fetchProducts();
                         alert('スプレッドシートに正常に登録されました！');
+                    })
+                    .catch(err => {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = 'サイトに商品を登録する';
+                        alert('登録に失敗しました。Google側の認証（Continue）が完了しているか確認してください。');
                     });
                 };
             };
